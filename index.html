@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Malla Interactiva - Ingeniería Electrónica UNC</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-color: #f5f5f5;
+            --text-color: #333;
+            --card-bg: #fff;
+            --border-color: #ddd;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --approved-color: #9b59b6;
+            --available-color: #f8d7da;
+            --blocked-color: #dc3545;
+            --nivelacion-color: #3498db;
+            --matematicas-color: #e74c3c;
+            --fisica-color: #2ecc71;
+            --electronica-color: #f39c12;
+            --sistemas-color: #9b59b6;
+            --comunicaciones-color: #1abc9c;
+            --control-color: #34495e;
+            --industrial-color: #e67e22;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --card-bg: #2d2d2d;
+            --border-color: #444;
+            --shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 2px solid var(--text-color);
+            color: var(--text-color);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        .filter-select {
+            padding: 0.5rem;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            padding: 1rem;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .malla-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .semestre {
+            margin-bottom: 2rem;
+        }
+
+        .semestre-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .materias-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .materia {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .materia:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .materia.approved {
+            background: var(--approved-color);
+            color: white;
+            border-color: var(--approved-color);
+        }
+
+        .materia.available {
+            background: var(--available-color);
+            border-color: #f5c6cb;
+        }
+
+        .materia.blocked {
+            background: var(--blocked-color);
+            color: white;
+            border-color: var(--blocked-color);
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .materia.blocked:hover {
+            transform: none;
+        }
+
+        .materia-nombre {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .materia-info {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+        }
+
+        .materia-creditos {
+            font-size: 0.7rem;
+            opacity: 0.9;
+        }
+
+        .materia-area {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .area-nivelacion { background: var(--nivelacion-color); }
+        .area-matematicas { background: var(--matematicas-color); }
+        .area-fisica { background: var(--fisica-color); }
+        .area-electronica { background: var(--electronica-color); }
+        .area-sistemas { background: var(--sistemas-color); }
+        .area-comunicaciones { background: var(--comunicaciones-color); }
+        .area-control { background: var(--control-color); }
+        .area-industrial { background: var(--industrial-color); }
+
+        .leyenda {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .leyenda-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: var(--card-bg);
+            border-radius: 5px;
+            font-size: 0.8rem;
+        }
+
+        .leyenda-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Estilos para el editor de personalización */
+        .editor-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .editor-panel {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .editor-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: var(--border-color);
+        }
+
+        .editor-section {
+            margin-bottom: 2rem;
+        }
+
+        .editor-section h3 {
+            margin-bottom: 1rem;
+            color: var(--text-color);
+            font-size: 1.2rem;
+        }
+
+        .editor-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            gap: 1rem;
+        }
+
+        .editor-label {
+            flex: 1;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .editor-input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            background: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .color-input {
+            width: 50px;
+            height: 40px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .font-preview {
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+
+        .editor-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        .editor-btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .editor-btn.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .editor-btn.primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .editor-btn.secondary {
+            background: var(--border-color);
+            color: var(--text-color);
+        }
+
+        .editor-btn.secondary:hover {
+            background: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        .preset-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .preset-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .preset-btn:hover {
+            background: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .stats {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .materias-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 id="main-title">Malla Interactiva - Ingeniería Electrónica</h1>
+        <p id="subtitle">Universidad Nacional de Córdoba</p>
+    </div>
+
+    <div class="controls">
+        <div class="control-group">
+            <button class="theme-toggle" onclick="toggleTheme()">🌙 Modo Oscuro</button>
+        </div>
+        <div class="control-group">
+            <button class="theme-toggle" onclick="abrirEditor()">🎨 Personalizar</button>
+        </div>
+        <div class="control-group">
+            <label>Filtrar por área:</label>
+            <select class="filter-select" onchange="filterByArea(this.value)">
+                <option value="">Todas las áreas</option>
+                <option value="nivelacion">Nivelación</option>
+                <option value="matematicas">Matemáticas</option>
+                <option value="fisica">Física</option>
+                <option value="electronica">Electrónica</option>
+                <option value="sistemas">Sistemas</option>
+                <option value="comunicaciones">Comunicaciones</option>
+                <option value="control">Control</option>
+                <option value="industrial">Industrial</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Editor de personalización -->
+    <div id="editor-overlay" class="editor-overlay hidden">
+        <div class="editor-panel">
+            <div class="editor-header">
+                <div class="editor-title">🎨 Personalizar Malla</div>
+                <button class="close-btn" onclick="cerrarEditor()">&times;</button>
+            </div>
+
+            <div class="editor-section">
+                <h3>📝 Textos</h3>
+                <div class="editor-row">
+                    <label class="editor-label">Título Principal:</label>
+                    <input type="text" class="editor-input" id="titulo-input" placeholder="Malla Interactiva - Ingeniería Electrónica">
+                </div>
+                <div class="editor-row">
+                    <label class="editor-label">Subtítulo:</label>
+                    <input type="text" class="editor-input" id="subtitulo-input" placeholder="Universidad Nacional de Córdoba">
+                </div>
+            </div>
+
+            <div class="editor-section">
+                <h3>🎨 Colores de Estados</h3>
+                <div class="editor-row">
+                    <label class="editor-label">Materia Aprobada:</label>
+                    <input type="color" class="color-input" id="color-approved" value="#9b59b6">
+                </div>
+                <div class="editor-row">
+                    <label class="editor-label">Materia Disponible:</label>
+                    <input type="color" class="color-input" id="color-available" value="#f8d7da">
+                </div>
+                <div class="editor-row">
+                    <label class="editor-label">Materia Bloqueada:</label>
+                    <input type="color" class="color-input" id="color-blocked" value="#dc3545">
+                </div>
+            </div>
+
+            <div class="editor-section">
+                <h3>🌈 Colores de Áreas</h3>
+                <div class="editor-row">
+                    <label class="editor-label">Nivelación:</label>
+                    <input type="color" class="color-input" id="color-nivelacion" value="#3498db">
+                </div>
+                <div class="editor-row">
+                    <label class="editor-label">Matemáticas:</label>
+                    <input type="color" class="color-input" id="color-matematicas" value="#e74c3c">
+                </div>
+                <div class="editor-row">
+                    <label class="editor-label">Física:</label>
+                    <input type="color" class="color-input" id="color-fisica" value="#2ecc71">
+                </div>
+                <div class="editor-row">
+                    <label class="editor-label">Electrónica:</label>
+                    <input type="color" class="color-input" id="color-electronica" value="#f39c12">
+                </div>
+                <div class="editor-row">
+                    <label class="editor-label">Sistemas:</label>
+                    <input type="color" class="color-input" id="color-sistemas" value="#9b59b6">
+                </div>
+                <div class="editor-row">
+                    <label class="editor-label">Comunicaciones:</label>
+                    <input type="color" class="color-input" id="color-comunicaciones" value="#1abc9c">
+                </div>
+                <div class="editor-row">
+                    <label class="editor-label">Control:</label>
+                    <input type="color" class="color-input" id="color-control" value="#34495e">
+                </div>
+                <div class="editor-row">
+                    <label class="editor-label">Industrial:</label>
+                    <input type="color" class="color-input" id="color-industrial" value="#e67e22">
+                </div>
+            </div>
+
+            <div class="editor-section">
+                <h3>🔤 Tipografía</h3>
+                <div class="editor-row">
+                    <label class="editor-label">Fuente Principal:</label>
+                    <select class="editor-input" id="font-select">
+                        <option value="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">Segoe UI (Por defecto)</option>
+                        <option value="'Arial', sans-serif">Arial</option>
+                        <option value="'Helvetica', sans-serif">Helvetica</option>
+                        <option value="'Times New Roman', serif">Times New Roman</option>
+                        <option value="'Georgia', serif">Georgia</option>
+                        <option value="'Courier New', monospace">Courier New</option>
+                        <option value="'Roboto', sans-serif">Roboto</option>
+                        <option value="'Open Sans', sans-serif">Open Sans</option>
+                        <option value="'Montserrat', sans-serif">Montserrat</option>
+                        <option value="'Nunito', sans-serif">Nunito</option>
+                    </select>
+                </div>
+                <div class="font-preview" id="font-preview">
+                    Vista previa de la fuente seleccionada
+                </div>
+            </div>
+
+            <div class="editor-section">
+                <h3>🎯 Presets</h3>
+                <div class="preset-buttons">
+                    <button class="preset-btn" onclick="aplicarPreset('default')">Por Defecto</button>
+                    <button class="preset-btn" onclick="aplicarPreset('dark')">Oscuro</button>
+                    <button class="preset-btn" onclick="aplicarPreset('pastel')">Pastel</button>
+                    <button class="preset-btn" onclick="aplicarPreset('neon')">Neón</button>
+                    <button class="preset-btn" onclick="aplicarPreset('professional')">Profesional</button>
+                </div>
+            </div>
+
+            <div class="editor-buttons">
+                <button class="editor-btn secondary" onclick="resetearPersonalizacion()">Resetear</button>
+                <button class="editor-btn primary" onclick="aplicarPersonalizacion()">Aplicar Cambios</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card">
+            <span class="stat-number" id="materias-aprobadas">0</span>
+            <span>Aprobadas</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number" id="materias-disponibles">0</span>
+            <span>Disponibles</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number" id="materias-bloqueadas">0</span>
+            <span>Bloqueadas</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number" id="promedio">0.0</span>
+            <span>Promedio</span>
+        </div>
+    </div>
+
+    <div class="malla-container">
+        <div id="malla-content">
+            <!-- El contenido se generará dinámicamente -->
+        </div>
+    </div>
+
+    <div class="leyenda">
+        <div class="leyenda-item">
+            <div class="leyenda-color" style="background: var(--approved-color);"></div>
+            <span>Aprobada</span>
+        </div>
+        <div class="leyenda-item">
+            <div class="leyenda-color" style="background: var(--available-color);"></div>
+            <span>Disponible</span>
+        </div>
+        <div class="leyenda-item">
+            <div class="leyenda-color" style="background: var(--blocked-color);"></div>
+            <span>Bloqueada</span>
+        </div>
+    </div>
+
+    <script>
+        // Datos de las materias basados en tu plan de estudios
+        const materias = {
+            // Nivelación
+            'nivelacion': {
+                'AMBIENTACION_UNIVERSITARIA': {
+                    nombre: 'Ambientación Universitaria',
+                    creditos: 1,
+                    codigo: '10-04050',
+                    correlativas: [],
+                    area: 'nivelacion',
+                    aprobada: true,
+                    nota: 'A'
+                },
+                'MATEMATICA_NIV': {
+                    nombre: 'Matemática',
+                    creditos: 3,
+                    codigo: '10-04051',
+                    correlativas: [],
+                    area: 'matematicas',
+                    aprobada: true,
+                    nota: 'A'
+                },
+                'FISICA_QUIMICA': {
+                    nombre: 'Física y Química',
+                    creditos: 3,
+                    codigo: '10-04052',
+                    correlativas: [],
+                    area: 'fisica',
+                    aprobada: true,
+                    nota: 'A'
+                }
+            },
+            // Primer año
+            'primer_semestre': {
+                'ANALISIS_MAT_1': {
+                    nombre: 'Análisis Matemático 1',
+                    creditos: 7,
+                    codigo: '10-04053',
+                    correlativas: ['MATEMATICA_NIV'],
+                    area: 'matematicas',
+                    aprobada: true,
+                    nota: 9
+                },
+                'QUIMICA': {
+                    nombre: 'Química',
+                    creditos: 5,
+                    codigo: '10-04057',
+                    correlativas: ['FISICA_QUIMICA'],
+                    area: 'fisica',
+                    aprobada: true,
+                    nota: 7
+                },
+                'SISTEMAS_REPRESENTACION': {
+                    nombre: 'Sistemas de Representación',
+                    creditos: 7,
+                    codigo: '10-04055',
+                    correlativas: [],
+                    area: 'sistemas',
+                    aprobada: false
+                },
+                'TALLER_LABORATORIO': {
+                    nombre: 'Taller y Laboratorio',
+                    creditos: 6,
+                    codigo: '10-04058',
+                    correlativas: [],
+                    area: 'electronica',
+                    aprobada: true,
+                    nota: 6.5
+                }
+            },
+            'segundo_semestre': {
+                'ALGEBRA_LINEAL': {
+                    nombre: 'Álgebra Lineal',
+                    creditos: 7,
+                    codigo: '10-04059',
+                    correlativas: ['ANALISIS_MAT_1'],
+                    area: 'matematicas',
+                    aprobada: true,
+                    nota: 7
+                },
+                'FISICA_1': {
+                    nombre: 'Física 1',
+                    creditos: 7,
+                    codigo: '10-04060',
+                    correlativas: ['ANALISIS_MAT_1', 'QUIMICA'],
+                    area: 'fisica',
+                    aprobada: true,
+                    nota: 8
+                },
+                'INFORMATICA_CALCULO': {
+                    nombre: 'Informática y Cálculo Numérico',
+                    creditos: 7,
+                    codigo: '10-04061',
+                    correlativas: ['ANALISIS_MAT_1'],
+                    area: 'sistemas',
+                    aprobada: true,
+                    nota: 8
+                },
+                'MODULO_INGLES': {
+                    nombre: 'Módulo de Inglés',
+                    creditos: 3,
+                    codigo: '10-04066',
+                    correlativas: [],
+                    area: 'nivelacion',
+                    aprobada: true,
+                    nota: 8
+                }
+            },
+            // Segundo año
+            'tercer_semestre': {
+                'ANALISIS_MAT_2': {
+                    nombre: 'Análisis Matemático 2',
+                    creditos: 7,
+                    codigo: '10-04063',
+                    correlativas: ['ALGEBRA_LINEAL'],
+                    area: 'matematicas',
+                    aprobada: true,
+                    nota: 5
+                },
+                'ELECTRONICA_DIGITAL_1': {
+                    nombre: 'Electrónica Digital 1',
+                    creditos: 10,
+                    codigo: '10-04068',
+                    correlativas: ['FISICA_1'],
+                    area: 'electronica',
+                    aprobada: false
+                },
+                'INFORMATICA_AVANZADA': {
+                    nombre: 'Informática Avanzada',
+                    creditos: 6,
+                    codigo: '10-09700',
+                    correlativas: ['INFORMATICA_CALCULO'],
+                    area: 'sistemas',
+                    aprobada: false
+                },
+                'PROBABILIDAD_ESTADISTICA': {
+                    nombre: 'Probabilidad y Estadística',
+                    creditos: 5,
+                    codigo: '10-04062',
+                    correlativas: ['ANALISIS_MAT_1'],
+                    area: 'matematicas',
+                    aprobada: false
+                }
+            },
+            'cuarto_semestre': {
+                'ANALISIS_MAT_3': {
+                    nombre: 'Análisis Matemático 3',
+                    creditos: 7,
+                    codigo: '10-04070',
+                    correlativas: ['ANALISIS_MAT_2'],
+                    area: 'matematicas',
+                    aprobada: true,
+                    nota: 7
+                },
+                'DISPOSITIVOS_ELECTRONICOS': {
+                    nombre: 'Dispositivos Electrónicos',
+                    creditos: 6,
+                    codigo: '10-09701',
+                    correlativas: ['FISICA_1'],
+                    area: 'electronica',
+                    aprobada: false
+                },
+                'ELECTRONICA_DIGITAL_2': {
+                    nombre: 'Electrónica Digital 2',
+                    creditos: 10,
+                    codigo: '10-04071',
+                    correlativas: ['ELECTRONICA_DIGITAL_1'],
+                    area: 'electronica',
+                    aprobada: false
+                },
+                'FISICA_2': {
+                    nombre: 'Física 2',
+                    creditos: 7,
+                    codigo: '10-04067',
+                    correlativas: ['FISICA_1', 'ANALISIS_MAT_2'],
+                    area: 'fisica',
+                    aprobada: false
+                }
+            },
+            // Tercer año
+            'quinto_semestre': {
+                'ELECTRONICA_DIGITAL_3': {
+                    nombre: 'Electrónica Digital 3',
+                    creditos: 10,
+                    codigo: '10-04075',
+                    correlativas: ['ELECTRONICA_DIGITAL_2'],
+                    area: 'electronica',
+                    aprobada: false
+                },
+                'MEDICIONES_ELECTRONICAS': {
+                    nombre: 'Mediciones Electrónicas',
+                    creditos: 8,
+                    codigo: '10-09702',
+                    correlativas: ['DISPOSITIVOS_ELECTRONICOS'],
+                    area: 'electronica',
+                    aprobada: false
+                },
+                'SENALES_SISTEMAS': {
+                    nombre: 'Señales y Sistemas',
+                    creditos: 8,
+                    codigo: '10-04076',
+                    correlativas: ['ANALISIS_MAT_3'],
+                    area: 'sistemas',
+                    aprobada: false
+                },
+                'TEORIA_CIRCUITOS': {
+                    nombre: 'Teoría de Circuitos',
+                    creditos: 8,
+                    codigo: '10-09703',
+                    correlativas: ['FISICA_2'],
+                    area: 'electronica',
+                    aprobada: false
+                }
+            },
+            'sexto_semestre': {
+                'ELECTRONICA_ANALOGICA_1': {
+                    nombre: 'Electrónica Analógica 1',
+                    creditos: 6,
+                    codigo: '10-09704',
+                    correlativas: ['TEORIA_CIRCUITOS'],
+                    area: 'electronica',
+                    aprobada: false
+                },
+                'SISTEMAS_COMPUTACION': {
+                    nombre: 'Sistemas de Computación',
+                    creditos: 10,
+                    codigo: '10-09705',
+                    correlativas: ['ELECTRONICA_DIGITAL_3'],
+                    area: 'sistemas',
+                    aprobada: false
+                },
+                'SISTEMAS_CONTROL_1': {
+                    nombre: 'Sistemas de Control 1',
+                    creditos: 8,
+                    codigo: '10-04081',
+                    correlativas: ['SENALES_SISTEMAS'],
+                    area: 'control',
+                    aprobada: false
+                },
+                'TECNOLOGIA_ELECTRONICA': {
+                    nombre: 'Tecnología Electrónica',
+                    creditos: 6,
+                    codigo: '10-09706',
+                    correlativas: ['DISPOSITIVOS_ELECTRONICOS'],
+                    area: 'electronica',
+                    aprobada: false
+                }
+            },
+            // Cuarto año
+            'septimo_semestre': {
+                'ELECTRONICA_ANALOGICA_2': {
+                    nombre: 'Electrónica Analógica 2',
+                    creditos: 10,
+                    codigo: '10-09707',
+                    correlativas: ['ELECTRONICA_ANALOGICA_1'],
+                    area: 'electronica',
+                    aprobada: false
+                },
+                'INGENIERIA_ECONOMICA': {
+                    nombre: 'Ingeniería Económica y Legal',
+                    creditos: 6,
+                    codigo: '10-04064',
+                    correlativas: [],
+                    area: 'industrial',
+                    aprobada: false
+                },
+                'INSTALACIONES_ELECTRICAS': {
+                    nombre: 'Instalaciones Eléctricas',
+                    creditos: 10,
+                    codigo: '10-09708',
+                    correlativas: ['TEORIA_CIRCUITOS'],
+                    area: 'electronica',
+                    aprobada: false
+                },
+                'SISTEMAS_COMUNICACION': {
+                    nombre: 'Sistemas de Comunicación',
+                    creditos: 10,
+                    codigo: '10-09709',
+                    correlativas: ['SENALES_SISTEMAS'],
+                    area: 'comunicaciones',
+                    aprobada: false
+                }
+            },
+            'octavo_semestre': {
+                'CAMPO_ELECTROMAGNETICO': {
+                    nombre: 'Campo Electromagnético',
+                    creditos: 8,
+                    codigo: '10-09710',
+                    correlativas: ['FISICA_2', 'ANALISIS_MAT_3'],
+                    area: 'fisica',
+                    aprobada: false
+                },
+                'ELECTRONICA_ANALOGICA_3': {
+                    nombre: 'Electrónica Analógica 3',
+                    creditos: 10,
+                    codigo: '10-09711',
+                    correlativas: ['ELECTRONICA_ANALOGICA_2'],
+                    area: 'electronica',
+                    aprobada: false
+                },
+                'HIGIENE_SEGURIDAD': {
+                    nombre: 'Higiene y Seguridad',
+                    creditos: 5,
+                    codigo: '10-04078',
+                    correlativas: [],
+                    area: 'industrial',
+                    aprobada: false
+                },
+                'SISTEMAS_CONTROL_2': {
+                    nombre: 'Sistemas de Control 2',
+                    creditos: 10,
+                    codigo: '10-04082',
+                    correlativas: ['SISTEMAS_CONTROL_1'],
+                    area: 'control',
+                    aprobada: false
+                }
+            },
+            // Quinto año
+            'noveno_semestre': {
+                'ELECTRONICA_INDUSTRIAL': {
+                    nombre: 'Electrónica Industrial',
+                    creditos: 10,
+                    codigo: '10-09712',
+                    correlativas: ['ELECTRONICA_ANALOGICA_3', 'SISTEMAS_CONTROL_2'],
+                    area: 'industrial',
+                    aprobada: false
+                },
+                'INGENIERIA_MICROONDAS': {
+                    nombre: 'Ingeniería de Microondas',
+                    creditos: 10,
+                    codigo: '10-09713',
+                    correlativas: ['CAMPO_ELECTROMAGNETICO'],
+                    area: 'comunicaciones',
+                    aprobada: false
+                }
+            },
+            'decimo_semestre': {
+                'PRACTICA_PROFESIONAL': {
+                    nombre: 'Práctica Profesional Supervisada',
+                    creditos: 10,
+                    codigo: '10-09715',
+                    correlativas: [], // Requiere materias aprobadas según reglamento
+                    area: 'industrial',
+                    aprobada: false
+                },
+                'PROYECTO_INTEGRADOR': {
+                    nombre: 'Proyecto Integrador',
+                    creditos: 9,
+                    codigo: '10-09717',
+                    correlativas: [], // Requiere materias aprobadas según reglamento
+                    area: 'industrial',
+                    aprobada: false
+                }
+            }
+        };
+
+        let estadoMaterias = {};
+        let filtroActual = '';
+        let personalizacion = {
+            titulo: 'Malla Interactiva - Ingeniería Electrónica',
+            subtitulo: 'Universidad Nacional de Córdoba',
+            colores: {
+                approved: '#9b59b6',
+                available: '#f8d7da',
+                blocked: '#dc3545',
+                nivelacion: '#3498db',
+                matematicas: '#e74c3c',
+                fisica: '#2ecc71',
+                electronica: '#f39c12',
+                sistemas: '#9b59b6',
+                comunicaciones: '#1abc9c',
+                control: '#34495e',
+                industrial: '#e67e22'
+            },
+            fuente: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+        };
+
+        // Funciones del editor de personalización
+        function abrirEditor() {
+            // Cargar valores actuales
+            document.getElementById('titulo-input').value = personalizacion.titulo;
+            document.getElementById('subtitulo-input').value = personalizacion.subtitulo;
+            document.getElementById('color-approved').value = personalizacion.colores.approved;
+            document.getElementById('color-available').value = personalizacion.colores.available;
+            document.getElementById('color-blocked').value = personalizacion.colores.blocked;
+            document.getElementById('color-nivelacion').value = personalizacion.colores.nivelacion;
+            document.getElementById('color-matematicas').value = personalizacion.colores.matematicas;
+            document.getElementById('color-fisica').value = personalizacion.colores.fisica;
+            document.getElementById('color-electronica').value = personalizacion.colores.electronica;
+            document.getElementById('color-sistemas').value = personalizacion.colores.sistemas;
+            document.getElementById('color-comunicaciones').value = personalizacion.colores.comunicaciones;
+            document.getElementById('color-control').value = personalizacion.colores.control;
+            document.getElementById('color-industrial').value = personalizacion.colores.industrial;
+            document.getElementById('font-select').value = personalizacion.fuente;
+            
+            actualizarVistaPrevia();
+            document.getElementById('editor-overlay').classList.remove('hidden');
+        }
+
+        function cerrarEditor() {
+            document.getElementById('editor-overlay').classList.add('hidden');
+        }
+
+        function actualizarVistaPrevia() {
+            const fontSelect = document.getElementById('font-select');
+            const preview = document.getElementById('font-preview');
+            preview.style.fontFamily = fontSelect.value;
+        }
+
+        function aplicarPersonalizacion() {
+            // Actualizar objeto de personalización
+            personalizacion.titulo = document.getElementById('titulo-input').value;
+            personalizacion.subtitulo = document.getElementById('subtitulo-input').value;
+            personalizacion.colores.approved = document.getElementById('color-approved').value;
+            personalizacion.colores.available = document.getElementById('color-available').value;
+            personalizacion.colores.blocked = document.getElementById('color-blocked').value;
+            personalizacion.colores.nivelacion = document.getElementById('color-nivelacion').value;
+            personalizacion.colores.matematicas = document.getElementById('color-matematicas').value;
+            personalizacion.colores.fisica = document.getElementById('color-fisica').value;
+            personalizacion.colores.electronica = document.getElementById('color-electronica').value;
+            personalizacion.colores.sistemas = document.getElementById('color-sistemas').value;
+            personalizacion.colores.comunicaciones = document.getElementById('color-comunicaciones').value;
+            personalizacion.colores.control = document.getElementById('color-control').value;
+            personalizacion.colores.industrial = document.getElementById('color-industrial').value;
+            personalizacion.fuente = document.getElementById('font-select').value;
+            
+            // Aplicar cambios
+            aplicarEstilosPersonalizados();
+            guardarPersonalizacion();
+            cerrarEditor();
+        }
+
+        function aplicarEstilosPersonalizados() {
+            const root = document.documentElement;
+            
+            // Aplicar textos
+            document.getElementById('main-title').textContent = personalizacion.titulo;
+            document.getElementById('subtitle').textContent = personalizacion.subtitulo;
+            
+            // Aplicar fuente
+            document.body.style.fontFamily = personalizacion.fuente;
+            
+            // Aplicar colores
+            root.style.setProperty('--approved-color', personalizacion.colores.approved);
+            root.style.setProperty('--available-color', personalizacion.colores.available);
+            root.style.setProperty('--blocked-color', personalizacion.colores.blocked);
+            root.style.setProperty('--nivelacion-color', personalizacion.colores.nivelacion);
+            root.style.setProperty('--matematicas-color', personalizacion.colores.matematicas);
+            root.style.setProperty('--fisica-color', personalizacion.colores.fisica);
+            root.style.setProperty('--electronica-color', personalizacion.colores.electronica);
+            root.style.setProperty('--sistemas-color', personalizacion.colores.sistemas);
+            root.style.setProperty('--comunicaciones-color', personalizacion.colores.comunicaciones);
+            root.style.setProperty('--control-color', personalizacion.colores.control);
+            root.style.setProperty('--industrial-color', personalizacion.colores.industrial);
+        }
+
+        function aplicarPreset(preset) {
+            const presets = {
+                default: {
+                    titulo: 'Malla Interactiva - Ingeniería Electrónica',
+                    subtitulo: 'Universidad Nacional de Córdoba',
+                    colores: {
+                        approved: '#9b59b6',
+                        available: '#f8d7da',
+                        blocked: '#dc3545',
+                        nivelacion: '#3498db',
+                        matematicas: '#e74c3c',
+                        fisica: '#2ecc71',
+                        electronica: '#f39c12',
+                        sistemas: '#9b59b6',
+                        comunicaciones: '#1abc9c',
+                        control: '#34495e',
+                        industrial: '#e67e22'
+                    },
+                    fuente: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+                },
+                dark: {
+                    titulo: 'Malla Interactiva - Ingeniería Electrónica',
+                    subtitulo: 'Universidad Nacional de Córdoba',
+                    colores: {
+                        approved: '#8e44ad',
+                        available: '#2c3e50',
+                        blocked: '#e74c3c',
+                        nivelacion: '#3498db',
+                        matematicas: '#e74c3c',
+                        fisica: '#27ae60',
+                        electronica: '#f39c12',
+                        sistemas: '#9b59b6',
+                        comunicaciones: '#16a085',
+                        control: '#34495e',
+                        industrial: '#d35400'
+                    },
+                    fuente: "'Roboto', sans-serif"
+                },
+                pastel: {
+                    titulo: 'Mi Malla Universitaria ✨',
+                    subtitulo: 'Universidad Nacional de Córdoba',
+                    colores: {
+                        approved: '#d1c4e9',
+                        available: '#f8bbd9',
+                        blocked: '#ffcdd2',
+                        nivelacion: '#bbdefb',
+                        matematicas: '#ffcdd2',
+                        fisica: '#c8e6c9',
+                        electronica: '#ffe0b2',
+                        sistemas: '#e1bee7',
+                        comunicaciones: '#b2dfdb',
+                        control: '#cfd8dc',
+                        industrial: '#ffcc80'
+                    },
+                    fuente: "'Nunito', sans-serif"
+                },
+                neon: {
+                    titulo: 'MALLA ELECTRÓNICA [FUTURISTA]',
+                    subtitulo: 'Universidad Nacional de Córdoba',
+                    colores: {
+                        approved: '#00ff88',
+                        available: '#ff0080',
+                        blocked: '#ff4444',
+                        nivelacion: '#00ccff',
+                        matematicas: '#ff3366',
+                        fisica: '#00ff66',
+                        electronica: '#ffaa00',
+                        sistemas: '#cc00ff',
+                        comunicaciones: '#00ffaa',
+                        control: '#6600ff',
+                        industrial: '#ff6600'
+                    },
+                    fuente: "'Courier New', monospace"
+                },
+                professional: {
+                    titulo: 'Plan de Estudios - Ingeniería Electrónica',
+                    subtitulo: 'Universidad Nacional de Córdoba',
+                    colores: {
+                        approved: '#2c5282',
+                        available: '#e2e8f0',
+                        blocked: '#a0aec0',
+                        nivelacion: '#3182ce',
+                        matematicas: '#e53e3e',
+                        fisica: '#38a169',
+                        electronica: '#d69e2e',
+                        sistemas: '#805ad5',
+                        comunicaciones: '#319795',
+                        control: '#2d3748',
+                        industrial: '#dd6b20'
+                    },
+                    fuente: "'Georgia', serif"
+                }
+            };
+            
+            if (presets[preset]) {
+                personalizacion = { ...presets[preset] };
+                
+                // Actualizar inputs
+                document.getElementById('titulo-input').value = personalizacion.titulo;
+                document.getElementById('subtitulo-input').value = personalizacion.subtitulo;
+                document.getElementById('color-approved').value = personalizacion.colores.approved;
+                document.getElementById('color-available').value = personalizacion.colores.available;
+                document.getElementById('color-blocked').value = personalizacion.colores.blocked;
+                document.getElementById('color-nivelacion').value = personalizacion.colores.nivelacion;
+                document.getElementById('color-matematicas').value = personalizacion.colores.matematicas;
+                document.getElementById('color-fisica').value = personalizacion.colores.fisica;
+                document.getElementById('color-electronica').value = personalizacion.colores.electronica;
+                document.getElementById('color-sistemas').value = personalizacion.colores.sistemas;
+                document.getElementById('color-comunicaciones').value = personalizacion.colores.comunicaciones;
+                document.getElementById('color-control').value = personalizacion.colores.control;
+                document.getElementById('color-industrial').value = personalizacion.colores.industrial;
+                document.getElementById('font-select').value = personalizacion.fuente;
+                
+                actualizarVistaPrevia();
+            }
+        }
+
+        function resetearPersonalizacion() {
+            aplicarPreset('default');
+        }
+
+        function guardarPersonalizacion() {
+            localStorage.setItem('personalizacion-malla', JSON.stringify(personalizacion));
+        }
+
+        function cargarPersonalizacion() {
+            const saved = localStorage.getItem('personalizacion-malla');
+            if (saved) {
+                personalizacion = JSON.parse(saved);
+                aplicarEstilosPersonalizados();
+            }
+        }
+
+        // Event listeners para el editor
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('font-select').addEventListener('change', actualizarVistaPrevia);
+            
+            // Cerrar editor al hacer clic fuera
+            document.getElementById('editor-overlay').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    cerrarEditor();
+                }
+            });
+        });
+        function inicializarEstado() {
+            for (const semestre in materias) {
+                for (const codigo in materias[semestre]) {
+                    const materia = materias[semestre][codigo];
+                    estadoMaterias[codigo] = {
+                        aprobada: materia.aprobada || false,
+                        nota: materia.nota || null
+                    };
+                }
+            }
+            actualizarEstadoMaterias();
+        }
+
+        // Verificar si una materia está disponible
+        function estaDisponible(codigoMateria) {
+            if (estadoMaterias[codigoMateria].aprobada) return false;
+            
+            const materia = encontrarMateria(codigoMateria);
+            if (!materia) return false;
+            
+            return materia.correlativas.every(correlativa => estadoMaterias[correlativa]?.aprobada);
+        }
+
+        // Encontrar materia por código
+        function encontrarMateria(codigo) {
+            for (const semestre in materias) {
+                if (materias[semestre][codigo]) {
+                    return materias[semestre][codigo];
+                }
+            }
+            return null;
+        }
+
+        // Actualizar estado de todas las materias
+        function actualizarEstadoMaterias() {
+            for (const codigo in estadoMaterias) {
+                const materia = encontrarMateria(codigo);
+                if (materia) {
+                    materia.disponible = estaDisponible(codigo);
+                }
+            }
+            renderizarMalla();
+            actualizarEstadisticas();
+        }
+
+        // Toggle estado de materia
+        function toggleMateria(codigo) {
+            const materia = encontrarMateria(codigo);
+            if (!materia) return;
+            
+            if (estadoMaterias[codigo].aprobada) {
+                // Desaprobar materia
+                estadoMaterias[codigo].aprobada = false;
+                estadoMaterias[codigo].nota = null;
+            } else if (materia.disponible) {
+                // Aprobar materia
+                const nota = prompt(`Ingrese la nota para ${materia.nombre}:`, '7');
+                if (nota !== null && !isNaN(nota) && nota >= 1 && nota <= 10) {
+                    estadoMaterias[codigo].aprobada = true;
+                    estadoMaterias[codigo].nota = parseFloat(nota);
+                }
+            }
+            
+            actualizarEstadoMaterias();
+        }
+
+        // Renderizar malla
+        function renderizarMalla() {
+            const container = document.getElementById('malla-content');
+            container.innerHTML = '';
+            
+            const semestreNames = {
+                'nivelacion': 'Nivelación',
+                'primer_semestre': '1° Semestre',
+                'segundo_semestre': '2° Semestre',
+                'tercer_semestre': '3° Semestre',
+                'cuarto_semestre': '4° Semestre',
+                'quinto_semestre': '5° Semestre',
+                'sexto_semestre': '6° Semestre',
+                'septimo_semestre': '7° Semestre',
+                'octavo_semestre': '8° Semestre',
+                'noveno_semestre': '9° Semestre',
+                'decimo_semestre': '10° Semestre'
+            };
+            
+            for (const semestre in materias) {
+                const semestreDiv = document.createElement('div');
+                semestreDiv.className = 'semestre';
+                
+                const titulo = document.createElement('div');
+                titulo.className = 'semestre-title';
+                titulo.textContent = semestreNames[semestre];
+                
+                const grid = document.createElement('div');
+                grid.className = 'materias-grid';
+                
+                for (const codigo in materias[semestre]) {
+                    const materia = materias[semestre][codigo];
+                    
+                    // Aplicar filtro
+                    if (filtroActual && materia.area !== filtroActual) continue;
+                    
+                    const materiaDiv = document.createElement('div');
+                    materiaDiv.className = 'materia';
+                    materiaDiv.onclick = () => toggleMateria(codigo);
+                    
+                    // Determinar estado
+                    let estado = 'blocked';
+                    if (estadoMaterias[codigo].aprobada) {
+                        estado = 'approved';
+                    } else if (materia.disponible) {
+                        estado = 'available';
+                    }
+                    
+                    materiaDiv.classList.add(estado);
+                    
+                    materiaDiv.innerHTML = `
+                        <div class="materia-area area-${materia.area}"></div>
+                        <div class="materia-nombre">${materia.nombre}</div>
+                        <div class="materia-info">Código: ${materia.codigo}</div>
+                        <div class="materia-creditos">Créditos: ${materia.creditos}</div>
+                        ${estadoMaterias[codigo].nota ? `<div class="materia-creditos">Nota: ${estadoMaterias[codigo].nota}</div>` : ''}
+                    `;
+                    
+                    grid.appendChild(materiaDiv);
+                }
+                
+                if (grid.children.length > 0) {
+                    semestreDiv.appendChild(titulo);
+                    semestreDiv.appendChild(grid);
+                    container.appendChild(semestreDiv);
+                }
+            }
+        }
+
+        // Actualizar estadísticas
+        function actualizarEstadisticas() {
+            let aprobadas = 0;
+            let disponibles = 0;
+            let bloqueadas = 0;
+            let sumaNotas = 0;
+            let countNotas = 0;
+            
+            for (const codigo in estadoMaterias) {
+                const materia = encontrarMateria(codigo);
+                if (!materia) continue;
+                
+                if (estadoMaterias[codigo].aprobada) {
+                    aprobadas++;
+                    if (estadoMaterias[codigo].nota) {
+                        sumaNotas += estadoMaterias[codigo].nota;
+                        countNotas++;
+                    }
+                } else if (materia.disponible) {
+                    disponibles++;
+                } else {
+                    bloqueadas++;
+                }
+            }
+            
+            const promedio = countNotas > 0 ? (sumaNotas / countNotas).toFixed(2) : '0.00';
+            
+            document.getElementById('materias-aprobadas').textContent = aprobadas;
+            document.getElementById('materias-disponibles').textContent = disponibles;
+            document.getElementById('materias-bloqueadas').textContent = bloqueadas;
+            document.getElementById('promedio').textContent = promedio;
+        }
+
+        // Toggle tema
+        function toggleTheme() {
+            const body = document.body;
+            const button = document.querySelector('.theme-toggle');
+            
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                button.textContent = '🌙 Modo Oscuro';
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                button.textContent = '☀️ Modo Claro';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Filtrar por área
+        function filterByArea(area) {
+            filtroActual = area;
+            renderizarMalla();
+        }
+
+        // Cargar tema guardado
+        function cargarTema() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                document.querySelector('.theme-toggle').textContent = '☀️ Modo Claro';
+            }
+        }
+
+        // Guardar/cargar progreso
+        function guardarProgreso() {
+            localStorage.setItem('progreso-malla', JSON.stringify(estadoMaterias));
+        }
+
+        function cargarProgreso() {
+            const progreso = localStorage.getItem('progreso-malla');
+            if (progreso) {
+                const estadoGuardado = JSON.parse(progreso);
+                Object.assign(estadoMaterias, estadoGuardado);
+            }
+        }
+
+        // Auto-guardar progreso
+        function autoGuardar() {
+            guardarProgreso();
+            setTimeout(autoGuardar, 30000); // Guardar cada 30 segundos
+        }
+
+        // Inicializar aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarTema();
+            cargarPersonalizacion();
+            inicializarEstado();
+            cargarProgreso();
+            actualizarEstadoMaterias();
+            autoGuardar();
+        });
+
+        // Exportar progreso
+        function exportarProgreso() {
+            const data = {
+                timestamp: new Date().toISOString(),
+                progreso: estadoMaterias
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `progreso-malla-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Importar progreso
+        function importarProgreso() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const data = JSON.parse(e.target.result);
+                            if (data.progreso) {
+                                estadoMaterias = data.progreso;
+                                actualizarEstadoMaterias();
+                                guardarProgreso();
+                                alert('Progreso importado exitosamente!');
+                            }
+                        } catch (error) {
+                            alert('Error al importar el archivo. Formato inválido.');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        // Añadir botones de importar/exportar
+        document.addEventListener('DOMContentLoaded', function() {
+            const controls = document.querySelector('.controls');
+            
+            const exportBtn = document.createElement('button');
+            exportBtn.textContent = '📥 Exportar Progreso';
+            exportBtn.className = 'theme-toggle';
+            exportBtn.onclick = exportarProgreso;
+            
+            const importBtn = document.createElement('button');
+            importBtn.textContent = '📤 Importar Progreso';
+            importBtn.className = 'theme-toggle';
+            importBtn.onclick = importarProgreso;
+            
+            controls.appendChild(exportBtn);
+            controls.appendChild(importBtn);
+        });
+    </script>
+</body>
+</html>
