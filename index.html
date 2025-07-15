@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Malla Interactiva - UNC</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-bg: #1a1a2e;
+            --secondary-bg: #16213e;
+            --accent-bg: #0f3460;
+            --text-primary: #e94560;
+            --text-secondary: #ffffff;
+            --text-muted: #a0a0a0;
+            --approved-color: #b19cd9;
+            --available-color: #ffc0cb;
+            --blocked-color: #ff6b6b;
+            --border-color: #333;
+            --shadow-color: rgba(233, 69, 96, 0.1);
+        }
+
+        [data-theme="light"] {
+            --primary-bg: #f8f9fa;
+            --secondary-bg: #ffffff;
+            --accent-bg: #e9ecef;
+            --text-primary: #212529;
+            --text-secondary: #495057;
+            --text-muted: #6c757d;
+            --border-color: #dee2e6;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: var(--font-family, 'Segoe UI'), Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--primary-bg);
+            color: var(--text-secondary);
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: var(--secondary-bg);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px var(--shadow-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .title {
+            color: var(--text-primary);
+            font-size: var(--title-size, 2.5rem);
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px var(--shadow-color);
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .control-group label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        select, button, input {
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--accent-bg);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        select:hover, button:hover, input:hover {
+            border-color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        button {
+            background: var(--text-primary);
+            color: white;
+            font-weight: 500;
+            border: none;
+        }
+
+        button:hover {
+            background: #d63447;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .filter-section {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+
+        .filter-title {
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 8px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            background: var(--accent-bg);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--text-primary);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .malla-container {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px var(--shadow-color);
+        }
+
+        .periodo-section {
+            margin-bottom: 40px;
+        }
+
+        .periodo-title {
+            color: var(--text-primary);
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--text-primary);
+        }
+
+        .materias-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .materia {
+            background: var(--accent-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .materia:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px var(--shadow-color);
+        }
+
+        .materia.approved {
+            background: var(--approved-color);
+            color: white;
+            border-color: var(--approved-color);
+        }
+
+        .materia.available {
+            background: var(--available-color);
+            color: #333;
+            border-color: var(--available-color);
+        }
+
+        .materia.blocked {
+            background: var(--blocked-color);
+            color: white;
+            border-color: var(--blocked-color);
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .materia.hidden {
+            display: none;
+        }
+
+        .materia-name {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .materia-code {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-bottom: 8px;
+        }
+
+        .materia-credits {
+            font-size: 0.85rem;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        .materia-note {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .editor-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px var(--shadow-color);
+            z-index: 1000;
+            max-width: 300px;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .editor-panel.open {
+            transform: translateX(0);
+        }
+
+        .editor-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--text-primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            z-index: 1001;
+            transition: all 0.3s ease;
+        }
+
+        .editor-toggle:hover {
+            background: #d63447;
+            transform: scale(1.1);
+        }
+
+        .editor-section {
+            margin-bottom: 15px;
+        }
+
+        .editor-section h4 {
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .color-input, .range-input {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            background: var(--accent-bg);
+            border: 1px solid var(--border-color);
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+        }
+
+        .legend-color.approved { background: var(--approved-color); }
+        .legend-color.available { background: var(--available-color); }
+        .legend-color.blocked { background: var(--blocked-color); }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 1.8rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .materias-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .editor-panel {
+                position: fixed;
+                top: 0;
+                right: 0;
+                width: 100%;
+                height: 100%;
+                max-width: none;
+                border-radius: 0;
+                transform: translateX(100%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">Malla Interactiva - Universidad Nacional de Córdoba</h1>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label for="carrera">Carrera:</label>
+                    <select id="carrera">
+                        <option value="biomedica">Ingeniería Biomédica</option>
+                        <option value="electronica">Ingeniería Electrónica</option>
+                        <option value="sistemas">Tecnicatura en Sistemas Digitales</option>
+                    </select>
+                </div>
+                
+                <button id="theme-toggle">🌙 Modo Oscuro</button>
+                <button id="reset-progress">Reiniciar Progreso</button>
+                <button id="export-data">Exportar Datos</button>
+                <button id="import-data">Importar Datos</button>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="materias-aprobadas">0</div>
+                    <div class="stat-label">Materias Aprobadas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="materias-disponibles">0</div>
+                    <div class="stat-label">Materias Disponibles</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="promedio">0.0</div>
+                    <div class="stat-label">Promedio</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="progreso">0%</div>
+                    <div class="stat-label">Progreso</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-section">
+            <h3 class="filter-title">Filtros por Área Temática</h3>
+            <div class="filter-buttons" id="filter-buttons">
+                <button class="filter-btn active" data-area="all">Todas</button>
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color approved"></div>
+                <span>Aprobadas</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color available"></div>
+                <span>Disponibles</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color blocked"></div>
+                <span>Bloqueadas</span>
+            </div>
+        </div>
+
+        <div class="malla-container" id="malla-container">
+            <!-- Las materias se generarán aquí -->
+        </div>
+    </div>
+
+    <button class="editor-toggle" id="editor-toggle">⚙️</button>
+
+    <div class="editor-panel" id="editor-panel">
+        <div class="editor-section">
+            <h4>Colores</h4>
+            <label>Aprobadas:</label>
+            <input type="color" class="color-input" id="approved-color" value="#b19cd9">
+            
+            <label>Disponibles:</label>
+            <input type="color" class="color-input" id="available-color" value="#ffc0cb">
+            
+            <label>Bloqueadas:</label>
+            <input type="color" class="color-input" id="blocked-color" value="#ff6b6b">
+        </div>
+
+        <div class="editor-section">
+            <h4>Tipografía</h4>
+            <label>Familia:</label>
+            <select id="font-family">
+                <option value="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">Segoe UI</option>
+                <option value="Arial, sans-serif">Arial</option>
+                <option value="'Times New Roman', serif">Times New Roman</option>
+                <option value="'Courier New', monospace">Courier New</option>
+                <option value="Georgia, serif">Georgia</option>
+            </select>
+            
+            <label>Tamaño del título:</label>
+            <input type="range" class="range-input" id="title-size" min="1.5" max="4" step="0.1" value="2.5">
+        </div>
+
+        <div class="editor-section">
+            <h4>Título</h4>
+            <input type="text" id="custom-title" placeholder="Título personalizado">
+            <button onclick="applyCustomTitle()">Aplicar</button>
+        </div>
+    </div>
+
+    <script>
+        // Datos de las carreras
+        const carreras = {
+            biomedica: {
+                nombre: "Ingeniería Biomédica",
+                materias: {
+                    nivelacion: [
+                        { codigo: "10-04050", nombre: "Ambientación Universitaria", creditos: 1, area: "General", prerrequisitos: [] },
+                        { codigo: "10-04051", nombre: "Matemática", creditos: 3, area: "Matemática", prerrequisitos: [] },
+                        { codigo: "10-04052", nombre: "Física y Química", creditos: 3, area: "Física", prerrequisitos: [] }
+                    ],
+                    "1-1": [
+                        { codigo: "10-04053", nombre: "Análisis Matemático 1", creditos: 7, area: "Matemática", prerrequisitos: ["10-04051"] },
+                        { codigo: "10-04057", nombre: "Química", creditos: 5, area: "Química", prerrequisitos: ["10-04052"] },
+                        { codigo: "10-04058", nombre: "Taller y Laboratorio", creditos: 6, area: "Práctica", prerrequisitos: [] }
+                    ],
+                    "1-2": [
+                        { codigo: "10-04059", nombre: "Álgebra Lineal", creditos: 7, area: "Matemática", prerrequisitos: ["10-04051"] },
+                        { codigo: "10-04060", nombre: "Física 1", creditos: 7, area: "Física", prerrequisitos: ["10-04052"] },
+                        { codigo: "10-09200", nombre: "Química Orgánica y Biológica", creditos: 5, area: "Química", prerrequisitos: ["10-04057"] },
+                        { codigo: "10-04055", nombre: "Sistemas de Representación", creditos: 7, area: "Diseño", prerrequisitos: [] }
+                    ],
+                    "2-1": [
+                        { codigo: "10-04063", nombre: "Análisis Matemático 2", creditos: 7, area: "Matemática", prerrequisitos: ["10-04053"] },
+                        { codigo: "10-09201", nombre: "Anatomía para Ingenieros", creditos: 4, area: "Biomédica", prerrequisitos: [] },
+                        { codigo: "10-09202", nombre: "Estática y Resistencia de los Materiales", creditos: 6, area: "Mecánica", prerrequisitos: ["10-04060"] },
+                        { codigo: "10-04067", nombre: "Física 2", creditos: 7, area: "Física", prerrequisitos: ["10-04060"] },
+                        { codigo: "10-04066", nombre: "Módulo de Inglés", creditos: 3, area: "Idiomas", prerrequisitos: [] }
+                    ],
+                    "2-2": [
+                        { codigo: "10-04070", nombre: "Análisis Matemático 3", creditos: 7, area: "Matemática", prerrequisitos: ["10-04063"] },
+                        { codigo: "10-04074", nombre: "Electrónica", creditos: 6, area: "Electrónica", prerrequisitos: ["10-04067"] },
+                        { codigo: "10-09203", nombre: "Histología para Ingenieros", creditos: 4, area: "Biomédica", prerrequisitos: ["10-09201"] },
+                        { codigo: "10-04061", nombre: "Informática y Cálculo Numérico", creditos: 8, area: "Informática", prerrequisitos: [] },
+                        { codigo: "10-04062", nombre: "Probabilidad y Estadística", creditos: 5, area: "Matemática", prerrequisitos: ["10-04063"] }
+                    ],
+                    "3-1": [
+                        { codigo: "10-04068", nombre: "Electrónica Digital 1", creditos: 8, area: "Electrónica", prerrequisitos: ["10-04074"] },
+                        { codigo: "10-09204", nombre: "Electrotecnia General y Máquinas Eléctricas", creditos: 8, area: "Eléctrica", prerrequisitos: ["10-04067"] },
+                        { codigo: "10-09205", nombre: "Fisiología Humana", creditos: 4, area: "Biomédica", prerrequisitos: ["10-09203"] },
+                        { codigo: "10-04076", nombre: "Señales y Sistemas", creditos: 8, area: "Electrónica", prerrequisitos: ["10-04070"] }
+                    ],
+                    "3-2": [
+                        { codigo: "10-09206", nombre: "Biomateriales", creditos: 6, area: "Biomédica", prerrequisitos: ["10-09202"] },
+                        { codigo: "10-04071", nombre: "Electrónica Digital 2", creditos: 8, area: "Electrónica", prerrequisitos: ["10-04068"] },
+                        { codigo: "10-09207", nombre: "Física Biomédica", creditos: 4, area: "Biomédica", prerrequisitos: ["10-04067"] },
+                        { codigo: "10-04064", nombre: "Ingeniería Económica y Legal", creditos: 6, area: "Gestión", prerrequisitos: [] },
+                        { codigo: "10-09208", nombre: "Teoría de Redes y Control", creditos: 6, area: "Electrónica", prerrequisitos: ["10-04076"] }
+                    ],
+                    "4-1": [
+                        { codigo: "10-09209", nombre: "Electrónica Analógica", creditos: 6, area: "Electrónica", prerrequisitos: ["10-04074"] },
+                        { codigo: "10-09210", nombre: "Fisiopatología", creditos: 4, area: "Biomédica", prerrequisitos: ["10-09205"] },
+                        { codigo: "10-09211", nombre: "Instalaciones Hospitalarias", creditos: 10, area: "Biomédica", prerrequisitos: ["10-09204"] },
+                        { codigo: "10-09212", nombre: "Procesamiento de Señales", creditos: 6, area: "Electrónica", prerrequisitos: ["10-04076"] },
+                        { codigo: "10-09213", nombre: "Transductores y Sensores", creditos: 8, area: "Electrónica", prerrequisitos: ["10-04074"] }
+                    ],
+                    "4-2": [
+                        { codigo: "10-09214", nombre: "Biomecánica", creditos: 6, area: "Biomédica", prerrequisitos: ["10-09202"] },
+                        { codigo: "10-09215", nombre: "Imágenes en Medicina", creditos: 7, area: "Biomédica", prerrequisitos: ["10-09207"] },
+                        { codigo: "10-09216", nombre: "Instrumentación Biomédica", creditos: 10, area: "Biomédica", prerrequisitos: ["10-09213"] },
+                        { codigo: "10-09217", nombre: "Práctica Profesional Supervisada", creditos: 10, area: "Práctica", prerrequisitos: ["10-09211"] }
+                    ],
+                    "5-1": [
+                        { codigo: "10-09218", nombre: "Ingeniería en Rehabilitación", creditos: 7, area: "Biomédica", prerrequisitos: ["10-09214"] },
+                        { codigo: "10-09219", nombre: "Ingeniería Hospitalaria", creditos: 7, area: "Biomédica", prerrequisitos: ["10-09211"] },
+                        { codigo: "10-09220", nombre: "Modelos y Simulaciones", creditos: 7, area: "Biomédica", prerrequisitos: ["10-09212"] },
+                        { codigo: "10-09222", nombre: "Radiaciones Ionizantes en Medicina", creditos: 7, area: "Biomédica", prerrequisitos: ["10-09207"] }
+                    ],
+                    "5-2": [
+                        { codigo: "10-04078", nombre: "Higiene y Seguridad", creditos: 7, area: "Seguridad", prerrequisitos: [] },
+                        { codigo: "10-09223", nombre: "Seguridad y Normalización Biomédica", creditos: 7, area: "Biomédica", prerrequisitos: ["10-09216"] },
+                        { codigo: "10-09225", nombre: "Proyecto Integrador", creditos: 13, area: "Práctica", prerrequisitos: ["10-09217"] }
+                    ]
+                }
+            },
+            electronica: {
+                nombre: "Ingeniería Electrónica",
+                materias: {
+                    nivelacion: [
+                        { codigo: "10-04050", nombre: "Ambientación Universitaria", creditos: 1, area: "General", prerrequisitos: [] },
+                        { codigo: "10-04051", nombre: "Matemática", creditos: 3, area: "Matemática", prerrequisitos: [] },
+                        { codigo: "10-04052", nombre: "Física y Química", creditos: 3, area: "Física", prerrequisitos: [] }
+                    ],
+                    "1-1": [
+                        { codigo: "10-04053", nombre: "Análisis Matemático 1", creditos: 7, area: "Matemática", prerrequisitos: ["10-04051"] },
+                        { codigo: "10-04057", nombre: "Química", creditos: 5, area: "Química", prerrequisitos: ["10-04052"] },
+                        { codigo: "10-04055", nombre: "Sistemas de Representación", creditos: 7, area: "Diseño", prerrequisitos: [] },
+                        { codigo: "10-04058", nombre: "Taller y Laboratorio", creditos: 6, area: "Práctica", prerrequisitos: [] }
+                    ],
+                    "1-2": [
+                        { codigo: "10-04059", nombre: "Álgebra Lineal", creditos: 7, area: "Matemática", prerrequisitos: ["10-04051"] },
+                        { codigo: "10-04060", nombre: "Física 1", creditos: 7, area: "Física", prerrequisitos: ["10-04052"] },
+                        { codigo: "10-04061", nombre: "Informática y Cálculo Numérico", creditos: 7, area: "Informática", prerrequisitos: [] },
+                        { codigo: "10-04066", nombre: "Módulo de Inglés", creditos: 3, area: "Idiomas", prerrequisitos: [] }
+                    ],
+                    "2-1": [
+                        { codigo: "10-04063", nombre: "Análisis Matemático 2", creditos: 7, area: "Matemática", prerrequisitos: ["10-04053"] },
+                        { codigo: "10-04068", nombre: "Electrónica Digital 1", creditos: 10, area: "Electrónica", prerrequisitos: ["10-04060"] },
+                        { codigo: "10-09700", nombre: "Informática Avanzada", creditos: 6, area: "Informática", prerrequisitos: ["10-04061"] },
+                        { codigo: "10-04062", nombre: "Probabilidad y Estadística", creditos: 5, area: "Matemática", prerrequisitos: ["10-04059"] }
+                    ],
+                    "2-2": [
+                        { codigo: "10-04070", nombre: "Análisis Matemático 3", creditos: 7, area: "Matemática", prerrequisitos: ["10-04063"] },
+                        { codigo: "10-09701", nombre: "Dispositivos Electrónicos", creditos: 6, area: "Electrónica", prerrequisitos: ["10-04060"] },
+                        { codigo: "10-04071", nombre: "Electrónica Digital 2", creditos: 10, area: "Electrónica", prerrequisitos: ["10-04068"] },
+                        { codigo: "10-04067", nombre: "Física 2", creditos: 7, area: "Física", prerrequisitos: ["10-04060"] }
+                    ],
+                    "3-1": [
+                        { codigo: "10-04075", nombre: "Electrónica Digital 3", creditos: 10, area: "Electrónica", prerrequisitos: ["10-04071"] },
+                        { codigo: "10-09702", nombre: "Mediciones Electrónicas", creditos: 8, area: "Electrónica", prerrequisitos: ["10-09701"] },
+                        { codigo: "10-04076", nombre: "Señales y Sistemas", creditos: 8, area: "Electrónica", prerrequisitos: ["10-04070"] },
+                        { codigo: "10-09703", nombre: "Teoría de Circuitos", creditos: 8, area: "Electrónica", prerrequisitos: ["10-04067"] }
+                    ],
+                    "3-2": [
+                        { codigo: "10-09704", nombre: "Electrónica Analógica 1", creditos: 6, area: "Electrónica", prerrequisitos: ["10-09701"] },
+                        { codigo: "10-09705", nombre: "Sistemas de Computación", creditos: 10, area: "Informática", prerrequisitos: ["10-04075"] },
+                        { codigo: "10-04081", nombre: "Sistemas de Control 1", creditos: 8, area: "Control", prerrequisitos: ["10-04076"] },
+                        { codigo: "10-09706", nombre: "Tecnología Electrónica", creditos: 6, area: "Electrónica", prerrequisitos: ["10-09701"] }
+                    ],
+                    "4-1": [
+                        { codigo: "10-09707", nombre: "Electrónica Analógica 2", creditos: 10, area: "Electrónica", prerrequisitos: ["10-09704"] },
+                        { codigo: "10-04064", nombre: "Ingeniería Económica y Legal", creditos: 6, area: "Gestión", prerrequisitos: [] },
+                        { codigo: "10-09708", nombre: "Instalaciones Eléctricas", creditos: 10, area: "Eléctrica", prerrequisitos: ["10-09703"] },
+                        { codigo: "10-09709", nombre: "Sistemas de Comunicación", creditos: 10, area: "Comunicaciones", prerrequisitos: ["10-04076"] }
+                    ],
+                    "4-2": [
+                        { codigo: "10-09710", nombre: "Campo Electromagnético", creditos: 8, area: "Física", prerrequisitos: ["10-04067"] },
+                        { codigo: "10-09711", nombre: "Electrónica Analógica 3", creditos: 10, area: "Electrónica", prerrequisitos: ["10-09707"] },
+                        { codigo: "10-04078", nombre: "Higiene y Seguridad", creditos: 5, area: "Seguridad", prerrequisitos: [] },
+                        { codigo: "10-04082", nombre: "Sistemas de Control 2", creditos: 10, area: "Control", prerrequisitos: ["10-04081"] }
+                    ],
+                    "5-1": [
+                        { codigo: "10-09712", nombre: "Electrónica Industrial", creditos: 10, area: "Electrónica", prerrequisitos: ["10-09711"] },
+                        { codigo: "10-09713", nombre: "Ingeniería de Microondas", creditos: 10, area: "Comunicaciones", prerrequisitos: ["10-09710"] }
+                    ],
+                    "5-2": [
+                        { codigo: "10-09715", nombre: "Práctica Profesional Supervisada", creditos: 10, area: "Práctica", prerrequisitos: ["10-09712"] },
+                        { codigo: "10-09717", nombre: "Proyecto Integrador", creditos: 9, area: "Práctica", prerrequisitos: ["10-09715"] }
+                    ]
+                }
+            },
+            sistemas: {
+                nombre: "Tecnicatura Universitaria en Sistemas Digitales",
+                materias: {
+                    nivelacion: [
+                        { codigo: "10-04050", nombre: "Ambientación Universitaria", creditos: 1, area: "General", prerrequisitos: [] },
+                        { codigo: "10-04051", nombre: "Matemática", creditos: 3, area: "Matemática", prerrequisitos: [] },
+                        { codigo: "10-04052", nombre: "Física y Química", creditos: 3, area: "Física", prerrequisitos: [] }
+                    ],
+                    "1-1": [
+                        { codigo: "10-04055", nombre: "Sistemas de Representación", creditos: 7, area: "Diseño", prerrequisitos: [] },
+                        { codigo: "10-04053", nombre: "Análisis Matemático 1", creditos: 7, area: "Matemática", prerrequisitos: ["10-04051"] },
+                        { codigo: "10-04058", nombre: "Taller y Laboratorio", creditos: 6, area: "Práctica", prerrequisitos: [] }
+                    ],
+                    "1-2": [
+                        { codigo: "10-04059", nombre: "Álgebra Lineal", creditos: 7, area: "Matemática", prerrequisitos: ["10-04051"] },
+                        { codigo: "10-04060", nombre: "Física 1", creditos: 7, area: "Física", prerrequisitos: ["10-04052"] },
+                        { codigo: "10-04061", nombre: "Informática y Cálculo Numérico", creditos: 7, area: "Informática", prerrequisitos: [] }
+                    ],
+                    "2-1": [
+                        { codigo: "10-04068", nombre: "Electrónica Digital 1", creditos: 10, area: "Electrónica", prerrequisitos: ["10-04060"] },
+                        { codigo: "10-09700", nombre: "Informática Avanzada", creditos: 6, area: "Informática", prerrequisitos: ["10-04061"] },
+                        { codigo: "10-04067", nombre: "Física 2", creditos: 7, area: "Física", prerrequisitos: ["10-04060"] }
+                    ],
+                    "2-2": [
+                        { codigo: "10-04071", nombre: "Electrónica Digital 2", creditos: 10, area: "Electrónica", prerrequisitos: ["10-04068"] },
+                        { codigo: "10-04066", nombre: "Módulo de Inglés", creditos: 3, area: "Idiomas", prerrequisitos: [] },
+                        { codigo: "10-04074", nombre: "Electrónica", creditos: 6, area: "Electrónica", prerrequisitos: ["10-04067"] }
+                    ],
+                    "3-1": [
+                        { codigo: "10-04075", nombre: "Electrónica Digital 3", creditos: 10, area: "Electrónica", prerrequisitos: ["10-04071"] },
+                        { codigo: "10-09702", nombre: "Mediciones Electrónicas", creditos: 8, area: "Electrónica", prerrequisitos: ["10-04074"] }
+                    ],
+                    "3-2": [
+                        { codigo: "10-08400", nombre: "Práctica Supervisada Tecnicatura Universitaria en Sistemas Digitales", creditos: 6, area: "Práctica", prerrequisitos: ["10-04075"] },
+                        { codigo: "10-09706", nombre: "Tecnología Electrónica", creditos: 6, area: "Electrónica", prerrequisitos: ["10-09702"] }
+                    ]
+                }
+            }
+        };
+
+        // Variables globales
+        let carreraActual = 'biomedica';
+        let materiasAprobadas = new Set();
+        let notasMaterias = {};
+        let areaActiva = 'all';
+
+        // Cargar datos del localStorage
+        function cargarDatos() {
+            const datosGuardados = localStorage.getItem('mallaInteractiva');
+            if (datosGuardados) {
+                const datos = JSON.parse(datosGuardados);
+                materiasAprobadas = new Set(datos.materiasAprobadas || []);
+                notasMaterias = datos.notasMaterias || {};
+                carreraActual = datos.carreraActual || 'biomedica';
+                document.getElementById('carrera').value = carreraActual;
+            }
+        }
+
+        // Guardar datos en localStorage
+        function guardarDatos() {
+            const datos = {
+                materiasAprobadas: Array.from(materiasAprobadas),
+                notasMaterias: notasMaterias,
+                carreraActual: carreraActual
+            };
+            localStorage.setItem('mallaInteractiva', JSON.stringify(datos));
+        }
+
+        // Obtener áreas únicas
+        function obtenerAreas() {
+            const areas = new Set();
+            const materias = carreras[carreraActual].materias;
+            
+            Object.values(materias).forEach(periodo => {
+                periodo.forEach(materia => {
+                    areas.add(materia.area);
+                });
+            });
+            
+            return Array.from(areas).sort();
+        }
+
+        // Generar botones de filtro
+        function generarFiltros() {
+            const filterButtons = document.getElementById('filter-buttons');
+            const areas = obtenerAreas();
+            
+            filterButtons.innerHTML = '<button class="filter-btn active" data-area="all">Todas</button>';
+            
+            areas.forEach(area => {
+                const button = document.createElement('button');
+                button.className = 'filter-btn';
+                button.setAttribute('data-area', area);
+                button.textContent = area;
+                filterButtons.appendChild(button);
+            });
+        }
+
+        // Verificar prerrequisitos
+        function verificarPrerrequisitos(materia) {
+            return materia.prerrequisitos.every(prereq => materiasAprobadas.has(prereq));
+        }
+
+        // Obtener estado de materia
+        function obtenerEstadoMateria(materia) {
+            if (materiasAprobadas.has(materia.codigo)) {
+                return 'approved';
+            } else if (verificarPrerrequisitos(materia)) {
+                return 'available';
+            } else {
+                return 'blocked';
+            }
+        }
+
+        // Generar HTML de materia
+        function generarMateriaHTML(materia) {
+            const estado = obtenerEstadoMateria(materia);
+            const nota = notasMaterias[materia.codigo] || '';
+            const oculta = areaActiva !== 'all' && materia.area !== areaActiva ? 'hidden' : '';
+            
+            return `
+                <div class="materia ${estado} ${oculta}" data-codigo="${materia.codigo}" data-area="${materia.area}">
+                    <div class="materia-name">${materia.nombre}</div>
+                    <div class="materia-code">${materia.codigo}</div>
+                    <div class="materia-credits">${materia.creditos} créditos</div>
+                    ${nota ? `<div class="materia-note">${nota}</div>` : ''}
+                </div>
+            `;
+        }
+
+        // Generar malla curricular
+        function generarMalla() {
+            const container = document.getElementById('malla-container');
+            const materias = carreras[carreraActual].materias;
+            
+            container.innerHTML = '';
+            
+            const periodos = {
+                'nivelacion': 'Ciclo de Nivelación',
+                '1-1': '1er Año - 1er Semestre',
+                '1-2': '1er Año - 2do Semestre',
+                '2-1': '2do Año - 1er Semestre',
+                '2-2': '2do Año - 2do Semestre',
+                '3-1': '3er Año - 1er Semestre',
+                '3-2': '3er Año - 2do Semestre',
+                '4-1': '4to Año - 1er Semestre',
+                '4-2': '4to Año - 2do Semestre',
+                '5-1': '5to Año - 1er Semestre',
+                '5-2': '5to Año - 2do Semestre'
+            };
+            
+            Object.entries(materias).forEach(([periodo, materiasDelPeriodo]) => {
+                if (materiasDelPeriodo.length > 0) {
+                    const seccion = document.createElement('div');
+                    seccion.className = 'periodo-section';
+                    seccion.innerHTML = `
+                        <h2 class="periodo-title">${periodos[periodo]}</h2>
+                        <div class="materias-grid">
+                            ${materiasDelPeriodo.map(materia => generarMateriaHTML(materia)).join('')}
+                        </div>
+                    `;
+                    container.appendChild(seccion);
+                }
+            });
+        }
+
+        // Manejar clic en materia
+        function manejarClicMateria(evento) {
+            const materia = evento.currentTarget;
+            const codigo = materia.dataset.codigo;
+            const estado = materia.classList.contains('approved') ? 'approved' : 
+                          materia.classList.contains('available') ? 'available' : 'blocked';
+            
+            if (estado === 'blocked') return;
+            
+            if (estado === 'available') {
+                const nota = prompt('Ingrese la nota (o deje vacío para marcar como aprobada):');
+                if (nota !== null) {
+                    materiasAprobadas.add(codigo);
+                    if (nota.trim() !== '') {
+                        notasMaterias[codigo] = nota.trim();
+                    }
+                    guardarDatos();
+                    generarMalla();
+                    actualizarEstadisticas();
+                }
+            } else if (estado === 'approved') {
+                if (confirm('¿Desea desmarcar esta materia como aprobada?')) {
+                    materiasAprobadas.delete(codigo);
+                    delete notasMaterias[codigo];
+                    guardarDatos();
+                    generarMalla();
+                    actualizarEstadisticas();
+                }
+            }
+        }
+
+        // Calcular estadísticas
+        function calcularEstadisticas() {
+            const materias = carreras[carreraActual].materias;
+            let totalMaterias = 0;
+            let materiasAprobadas = 0;
+            let materiasDisponibles = 0;
+            let sumaNotas = 0;
+            let materiasConNota = 0;
+            
+            Object.values(materias).forEach(periodo => {
+                periodo.forEach(materia => {
+                    totalMaterias++;
+                    const estado = obtenerEstadoMateria(materia);
+                    
+                    if (estado === 'approved') {
+                        materiasAprobadas++;
+                        const nota = notasMaterias[materia.codigo];
+                        if (nota && !isNaN(parseFloat(nota))) {
+                            sumaNotas += parseFloat(nota);
+                            materiasConNota++;
+                        }
+                    } else if (estado === 'available') {
+                        materiasDisponibles++;
+                    }
+                });
+            });
+            
+            return {
+                totalMaterias,
+                materiasAprobadas,
+                materiasDisponibles,
+                promedio: materiasConNota > 0 ? (sumaNotas / materiasConNota).toFixed(2) : '0.0',
+                progreso: Math.round((materiasAprobadas / totalMaterias) * 100)
+            };
+        }
+
+        // Actualizar estadísticas
+        function actualizarEstadisticas() {
+            const stats = calcularEstadisticas();
+            
+            document.getElementById('materias-aprobadas').textContent = stats.materiasAprobadas;
+            document.getElementById('materias-disponibles').textContent = stats.materiasDisponibles;
+            document.getElementById('promedio').textContent = stats.promedio;
+            document.getElementById('progreso').textContent = stats.progreso + '%';
+        }
+
+        // Cambiar carrera
+        function cambiarCarrera() {
+            carreraActual = document.getElementById('carrera').value;
+            guardarDatos();
+            generarFiltros();
+            generarMalla();
+            actualizarEstadisticas();
+            asignarEventos();
+        }
+
+        // Filtrar por área
+        function filtrarPorArea(area) {
+            areaActiva = area;
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-area="${area}"]`).classList.add('active');
+            
+            document.querySelectorAll('.materia').forEach(materia => {
+                if (area === 'all' || materia.dataset.area === area) {
+                    materia.classList.remove('hidden');
+                } else {
+                    materia.classList.add('hidden');
+                }
+            });
+        }
+
+        // Asignar eventos a materias
+        function asignarEventos() {
+            document.querySelectorAll('.materia').forEach(materia => {
+                materia.addEventListener('click', manejarClicMateria);
+            });
+        }
+
+        // Alternar tema
+        function alternarTema() {
+            const body = document.body;
+            const button = document.getElementById('theme-toggle');
+            
+            if (body.dataset.theme === 'light') {
+                body.dataset.theme = 'dark';
+                button.textContent = '☀️ Modo Claro';
+            } else {
+                body.dataset.theme = 'light';
+                button.textContent = '🌙 Modo Oscuro';
+            }
+        }
+
+        // Reiniciar progreso
+        function reiniciarProgreso() {
+            if (confirm('¿Está seguro de que desea reiniciar todo el progreso?')) {
+                materiasAprobadas.clear();
+                notasMaterias = {};
+                guardarDatos();
+                generarMalla();
+                actualizarEstadisticas();
+                asignarEventos();
+            }
+        }
+
+        // Exportar datos
+        function exportarDatos() {
+            const datos = {
+                materiasAprobadas: Array.from(materiasAprobadas),
+                notasMaterias: notasMaterias,
+                carreraActual: carreraActual,
+                fecha: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(datos, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `malla-${carreraActual}-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Importar datos
+        function importarDatos() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const datos = JSON.parse(e.target.result);
+                            materiasAprobadas = new Set(datos.materiasAprobadas || []);
+                            notasMaterias = datos.notasMaterias || {};
+                            carreraActual = datos.carreraActual || 'biomedica';
+                            document.getElementById('carrera').value = carreraActual;
+                            guardarDatos();
+                            generarFiltros();
+                            generarMalla();
+                            actualizarEstadisticas();
+                            asignarEventos();
+                            alert('Datos importados correctamente');
+                        } catch (error) {
+                            alert('Error al importar datos: ' + error.message);
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        // Editor de personalización
+        function toggleEditor() {
+            const panel = document.getElementById('editor-panel');
+            panel.classList.toggle('open');
+        }
+
+        function aplicarColores() {
+            const approvedColor = document.getElementById('approved-color').value;
+            const availableColor = document.getElementById('available-color').value;
+            const blockedColor = document.getElementById('blocked-color').value;
+            
+            document.documentElement.style.setProperty('--approved-color', approvedColor);
+            document.documentElement.style.setProperty('--available-color', availableColor);
+            document.documentElement.style.setProperty('--blocked-color', blockedColor);
+        }
+
+        function aplicarFuente() {
+            const fontFamily = document.getElementById('font-family').value;
+            document.documentElement.style.setProperty('--font-family', fontFamily);
+        }
+
+        function aplicarTamañoTitulo() {
+            const titleSize = document.getElementById('title-size').value;
+            document.documentElement.style.setProperty('--title-size', titleSize + 'rem');
+        }
+
+        function applyCustomTitle() {
+            const customTitle = document.getElementById('custom-title').value;
+            if (customTitle.trim()) {
+                document.querySelector('.title').textContent = customTitle;
+            }
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarDatos();
+            generarFiltros();
+            generarMalla();
+            actualizarEstadisticas();
+            asignarEventos();
+            
+            // Event listeners
+            document.getElementById('carrera').addEventListener('change', cambiarCarrera);
+            document.getElementById('theme-toggle').addEventListener('click', alternarTema);
+            document.getElementById('reset-progress').addEventListener('click', reiniciarProgreso);
+            document.getElementById('export-data').addEventListener('click', exportarDatos);
+            document.getElementById('import-data').addEventListener('click', importarDatos);
+            document.getElementById('editor-toggle').addEventListener('click', toggleEditor);
+            
+            // Filtros
+            document.getElementById('filter-buttons').addEventListener('click', function(e) {
+                if (e.target.classList.contains('filter-btn')) {
+                    filtrarPorArea(e.target.dataset.area);
+                }
+            });
+            
+            // Editor
+            document.getElementById('approved-color').addEventListener('input', aplicarColores);
+            document.getElementById('available-color').addEventListener('input', aplicarColores);
+            document.getElementById('blocked-color').addEventListener('input', aplicarColores);
+            document.getElementById('font-family').addEventListener('change', aplicarFuente);
+            document.getElementById('title-size').addEventListener('input', aplicarTamañoTitulo);
+        });
+    </script>
+</body>
+</html>
